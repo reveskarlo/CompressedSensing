@@ -1,2 +1,1 @@
-# CompressedSensing
 Compressed Sensing project
