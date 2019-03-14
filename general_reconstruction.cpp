@@ -17,7 +17,7 @@
 #include "eigv_matrix_7.h"
 #include "eigv_matrix_8.h"
 #include "eigv_matrix_9.h"
-#include "test0.h"
+#include "test8.h"
 
 #define DIM 784													//Image dimensions 28 x 28 = 784
 #define MDIM 78													//Length of measured signal
@@ -32,7 +32,7 @@ int main(void) {
 
 	VectorXd x_test(DIM);
 	for (int i = 0; i < DIM; i++) {
-		x_test(i) = xTest0[i];									//Input test image to Eigen library VectorXd 
+		x_test(i) = xTest8[i];									//Input test image to Eigen library VectorXd 
 	}															//Change xTest in relation to #include at line 20
 
 	MatrixXd phi(MDIM, DIM);
@@ -75,8 +75,8 @@ int main(void) {
 
 																//Reconstruction based on compressed sensing
 	VectorXd alpha_rec(DIM), x_rec(DIM), recon(DIM);
-	double arec[DIM][NDIM], xrec[DIM][NDIM];
-	double arecL1[10], minL1;
+	float arec[DIM][NDIM], xrec[DIM][NDIM];
+	float arecL1[10], minL1;
 	int minL1_digit = 0;
 
 	x_rec = phi.transpose()*(phi*x_test);
