@@ -55,5 +55,52 @@ for i = 1:15
     end
 end
 
+%% Kovarijancijska matrica
+% Za svaki skup signala jedne frekvencije izracunaj mean (mu) i kov. matricu (sigma)
+
+for i = 1:15                % iterator frekvencije
+
+    sigma(:,:,i) = zeros(length(t), length(t));
+    mu(:,i) = mean(C(i,:,:), 3);
+    
+    for k = 1:size(C, 3)              % iterator faze
+        
+       sigma(:,:,i) = sigma(:,:,i) + ((((C(i,:,k)-mu(:,i))))*(C(i,:,k)-mu(:,i))');
+        
+    end
+    
+    sigma(:,:,i) = sigma(:,:,i)./size(C, 3);
+    
+end
+
+%% PCA, svojstveni vektori/vrijednosti
+
+for i = 1:size(sigma, 3)
+    
+    [V(:,:,i),D(:,:,i)] = eig(sigma(:,:,i));
+    
+end
+
+%% Zajednicka kovarijancijska matrica
+
+sigma_un = (1./size(sigma, 3))*sum(sigma,3);
+sigma_un = (1/2)*(sigma_un + sigma_un');
+[V_un, D_un] = eig(sigma_un);
+
+%% Mjerna matrica
+
+M = 10;
+phi = (V_un(:, end-M+1:end)');
+
+%% Rekonstrukcija
+
+
+
+
+
+
+
+
+
 
 
