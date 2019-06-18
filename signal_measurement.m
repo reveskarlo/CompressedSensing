@@ -4,14 +4,14 @@ f = 5e6;                        % frekvencija 5 MHz
 T = 1/f;                        % period
 kut = 2*pi/3;                   % fazni pomak
 
-t = 0:1e-8:1e-6;
+t = 0:1e-8:1e-6 - 1e-8;
 x = sin(2*pi*f*t + kut);
 x = awgn(x, 20);                % SNR = 20dB
 plot(t, x);
 xlabel('Vremenski osdjecak 1us');
 
-comb = zeros(1, 101);
-for i=1:10:101
+comb = zeros(1, 100);
+for i=1:10:100
     comb(i) = x(i);
 end
 hold on;
@@ -22,17 +22,17 @@ hold off;
 
 %% Mjerenje signala - 15 signala razlicitih faznih pomaka za svaku od 15 frekvencija
 
-f = linspace(3e6, 5e6, 15);            % 15 frekvencija od 5 MHz do 10 MHz
+f = linspace(3e6, 5e6, 15);            % 15 frekvencija od 3 MHz do 5 MHz
 faza = linspace(0, 2*pi, 15);           % 15 faznih pomaka od 0 rad do 2pi rad
-t = 0:1e-8:1e-6;
+t = 0:1e-8:1e-6 - 1e-8;
 
-X = zeros(15,101,15);                   % frekvencija x vrijeme x faza
-C = zeros(15,101,15);
+X = zeros(15,100,15);                   % frekvencija x vrijeme x faza
+C = zeros(15,100,15);
 
 for i = 1:size(C, 1)                            % iterator frekvencije
     for j = 1:size(C, 3)                        % iterator faze
         X(i,:,j) = awgn(sin(2*pi*f(i)*t + faza(j)), 20);
-        for k = 1:10:101
+        for k = 1:10:100
             C(i,k,j) = X(i,k,j);
         end
     end
@@ -93,26 +93,37 @@ M = 10;
 phi = (V_un(:, end-M+1:end)');
 
 %% Rekonstrukcija
+plot_stem = 1;
 
 for i = 1:size(C, 1)                    % iterator frekvencije
     for k = 1:size(C, 3)                % iterator faze
        
-        C_test = C(i,:,k);
-        y = phi*C_test';
-        X_rec(:,:,k) = phi'*y;
-        %alfa_rec(:,:,k) = V(:,:,k)'*X_rec(:,:,k);
-        
-        C_rec(:,:,k) = phi'*y;
-        alfa_rec(:,:,k) = V(:,:,k)'*X_rec(:,:,k);
+        C_test = C(i,:,k)';
+        y = phi*C_test;          
+        C_rec(:,:,k) = phi'*y;          % phi*phi' ~ I
+        alfa_rec(:,:,k) = V(:,:,k)'*C_rec(:,:,k);
         sig_rec = V(:,:,k)* alfa_rec(:,:,k);
         
-        stem(t, C_test);
-        hold on;
-        stem(t, sig_rec);
-        hold off;
-        xlabel('Vremenski osdjecak 1us');
-        title('Signal i deset uzoraka na odsjecku');
-        pause;                          % iteracija se nastavlja s ENTER, prekida s CTRL+C
+        if plot_stem
+            stem(t, C_test, 'b');
+            hold on;
+            stem(t, real(sig_rec), 'r');
+            hold off;
+            xlabel('Vremenski osdjecak 1us');
+            title('Signal i deset uzoraka na odsjecku');
+            legend('Izvorni signal', 'Rekonstruirani signal')
+            pause;                          % iteracija se nastavlja s ENTER, prekida s CTRL+C
+        else
+            plot(t, C_test, 'b');
+            hold on;
+            plot(t, real(sig_rec), 'r');
+            hold off;
+            xlabel('Vremenski osdjecak 1us');
+            title('Signal i deset uzoraka na odsjecku');
+            legend('Izvorni signal', 'Rekonstruirani signal')
+            pause;                          % iteracija se nastavlja s ENTER, prekida s CTRL+C
+        end
+        
     end
 end
 
